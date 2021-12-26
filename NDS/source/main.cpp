@@ -17,6 +17,8 @@ bool shouldDraw = false;
 bool queueAvaible = false;
 
 void VBlankProc() {
+	mmStreamUpdate();
+
 	if (shouldDraw) {
 		shouldDraw = false;
 
@@ -64,7 +66,7 @@ int main(void) {
 	
 
 	// nitrofiles initialization
-	if (!nitroFSInit(NULL)) {
+	if (nitroFSInit(NULL)) {
 		chdir("nitro:/");
 		std::cerr << "nitrofs init success" << std::endl;
 	} else {
@@ -97,8 +99,7 @@ int main(void) {
 	in.open("data_compress", std::ios::in | std::ios::binary);
 
 	while(true) {
-		// timerElapsed(2);
-		mmStreamUpdate();
+		timerElapsed(1);
 
 		if (!in.eof() && !queueAvaible) {
 			in.read((char*)&blockSize, sizeof(blockSize));
@@ -107,7 +108,7 @@ int main(void) {
 			queueAvaible = true;
 		}
 		
-		swiWaitForVBlank();
+		// swiWaitForVBlank();
 	}
 
 	// crashh

@@ -2,11 +2,11 @@ name: CI
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container: devkitpro/devkitarm
     name: "Build with devkitARM"
     outputs:
@@ -26,15 +26,15 @@ jobs:
       - name: Install dependency
         run: |
           sudo apt update -y
-          sudo apt install ffmpeg build-essential curl
+          sudo apt upgrade -y
+          sudo apt install ffmpeg build-essential -y
 
-          sudo curl -L https://yt-dl.org/downloads/latest/youtube-dl -o /usr/local/bin/youtube-dl
-          sudo chmod a+rx /usr/local/bin/youtube-dl
-
+          npm -g install ytdl
+      
       - name: Prepare video
         run: |
           cd assets
-          youtube-dl -f 18 https://www.youtube.com/watch?v=FtutLA63Cp8 -o 'video.%(ext)s'
+          ytdl "https://www.youtube.com/watch?v=FtutLA63Cp8" -o video.mp4
 
           sh convert.sh
 
