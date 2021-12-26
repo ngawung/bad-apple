@@ -1,0 +1,11 @@
+/assets/*
+!/assets/convert.sh
+
+/NDS/nitrofiles/*
+!/NDS/nitrofiles/.gitignore
+/NDS/cmake
+/NDS/compile_commands.json
+
+/encoder/node_modules
+
+/temp

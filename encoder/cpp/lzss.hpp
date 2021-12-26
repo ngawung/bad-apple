@@ -1,0 +1,1 @@
+void LZS_Encode(unsigned char*data, unsigned int length);

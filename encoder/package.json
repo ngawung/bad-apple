@@ -1,0 +1,15 @@
+{
+  "name": "decoder",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "child-process-promise": "^2.2.1",
+    "gify-parse": "^1.0.7",
+    "lz77": "^1.1.0",
+    "lzma-native": "^8.0.1",
+    "omggif": "^1.0.10",
+    "rgb-hex": "^4.0.0",
+    "write": "^2.0.0"
+  }
+}
