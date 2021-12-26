@@ -3,7 +3,6 @@
 #include <iostream>
 #include <fstream>
 #include <maxmod9.h>
-#include <vector>
 
 #define TIMER_SPEED (BUS_CLOCK/1024)
 
@@ -14,9 +13,23 @@ uint16_t blockSize;
 char buffer[256*192*2];
 char buffer2[256*256*2];
 
+bool shouldDraw = false;
+bool queueAvaible = false;
+
 void VBlankProc() {
-	in.read((char*)&blockSize, sizeof(blockSize));
-	in.read(buffer, blockSize);
+	if (shouldDraw) {
+		shouldDraw = false;
+
+		if (queueAvaible) {
+			queueAvaible = false;
+
+			dmaCopyWordsAsynch(3, buffer2, VRAM_A, 256*192*2);
+		}
+	}
+}
+
+void TimerTick() {
+	shouldDraw = true;
 }
 
 mm_word on_stream_request( mm_word length, mm_addr dest, mm_stream_formats format ) {
@@ -42,7 +55,7 @@ mm_word on_stream_request( mm_word length, mm_addr dest, mm_stream_formats forma
 }
 
 int main(void) {
-	consoleDebugInit(DebugDevice_NOCASH);
+	consoleDemoInit();
 
 	videoSetMode(MODE_FB0);
 	vramSetBankA(VRAM_A_LCD);
@@ -51,35 +64,16 @@ int main(void) {
 	
 
 	// nitrofiles initialization
-	if (nitroFSInit(NULL)) {
+	if (!nitroFSInit(NULL)) {
 		chdir("nitro:/");
 		std::cerr << "nitrofs init success" << std::endl;
 	} else {
 		consoleDemoInit();
-		std::cout << "cannot init nitrofs" << std::endl;
+		std::cout << "failed to init nitrofs" << std::endl;
+		std::cout << "Please launch the game\nfrom nds-bootstrap from twilightmenu" << std::endl;
 		while(1) {
 			// freezee
 		}
-	}
-
-	in.open("output", std::ios::binary);
-
-	uint16_t totalsize;
-	char buf[256*192*2];
-	char buf2[256*256*2];
-
-	in.read((char*)&totalsize, sizeof(totalsize));
-	in.read(buf, totalsize);
-
-	swiDecompressLZSSWram(buf, buf2);
-	dmaCopyWordsAsynch(3, buf2, VRAM_A, 256*192*2);
-
-	// for (int i=0; i<192*256; i++) {
-	// 	VRAM_A[i] = buf[i];
-	// }
-
-	while(1) {
-		// loop
 	}
 
 	mmInitDefault((char*)"soundbank.bin");
@@ -87,24 +81,31 @@ int main(void) {
 
 	mm_stream mystream;
 	mystream.sampling_rate	= 22050;					// sampling rate = 25khz
-	mystream.buffer_length	= 1200;						// buffer length = 1200 samples
+	mystream.buffer_length	= 2400;						// buffer length = 1200 samples
 	mystream.callback		= on_stream_request;		// set callback function
 	mystream.format			= MM_STREAM_16BIT_MONO;		// format = stereo 16-bit
 	mystream.timer			= MM_TIMER0;				// use hardware timer 0
-	mystream.manual			= false;						// use manual filling
+	mystream.manual			= true;						// use manual filling
 	mmStreamOpen( &mystream );
 
-	irqSet(IRQ_VBLANK, VBlankProc);
+	// quick hack... sometime it need to update once?
+	mmStreamUpdate(); mmStreamUpdate();
 
-	while(1) {
-		// loop
-	}
+	irqSet(IRQ_VBLANK, VBlankProc);
+	timerStart(2, ClockDivider_1024, TIMER_FREQ_1024(30), TimerTick);
 
 	in.open("data_compress", std::ios::in | std::ios::binary);
 
-	while(1) {
-		swiDecompressLZSSWram(buffer, buffer2);	
-		dmaCopyWordsAsynch(3, buffer2, VRAM_A, 256*192*2);
+	while(true) {
+		// timerElapsed(2);
+		mmStreamUpdate();
+
+		if (!in.eof() && !queueAvaible) {
+			in.read((char*)&blockSize, sizeof(blockSize));
+			in.read(buffer, blockSize);
+			swiDecompressLZSSWram(buffer, buffer2);
+			queueAvaible = true;
+		}
 		
 		swiWaitForVBlank();
 	}

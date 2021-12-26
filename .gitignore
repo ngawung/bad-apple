@@ -5,8 +5,13 @@
 !/NDS/nitrofiles/.gitignore
 /NDS/cmake
 /NDS/compile_commands.json
+/NDS/.cache
+/NDS/build
+/NDS/dist
 
 /encoder/node_modules
+/encoder/data_compress
+/encoder/temp
 /encoder/cpp/lzss
 
 /temp

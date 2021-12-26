@@ -15,4 +15,4 @@ ffmpeg -i $video -i $palette -lavfi "$filters [x]; [x][1:v] paletteuse=dither=no
 # ffmpeg -i $video -vf "$filters" out/out_%d.bmp
 
 # audio
-ffmpeg -i $video -f s16le -ac 1 -ar 48000 music.raw
+ffmpeg -i $video -f s16le -ac 1 -ar 22050 music.raw

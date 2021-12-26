@@ -5,7 +5,7 @@ const { execSync } = require('child_process');
 execSync("rm -rf data_compress")
 
 // load gif
-const gif_raw = fs.readFileSync("../assets/out-60.gif");
+const gif_raw = fs.readFileSync("../assets/out.gif");
 const gif_data = new omg.GifReader(gif_raw);
 const num_pixel = gif_data.width * gif_data.height;
 const num_frames = gif_data.numFrames();
@@ -65,8 +65,6 @@ for (let i=0; i<num_frames; i++) {
 
     console.log(`Convert frames ${i+1} of ${num_frames}`);
 }
-
-execSync("cp data_compress ../nitrofiles/")
 
 // console.log(buffer_final)
 // console.log(pallete)
