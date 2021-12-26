@@ -1,7 +1,6 @@
 /*----------------------------------------------------------------------------*/
 /*--  lzss.c - LZSS coding for Nintendo GBA/DS                              --*/
 /*--  Copyright (C) 2011 CUE                                                --*/
-/*--  Slightly modified by Ngawung                                          --*/
 /*--                                                                        --*/
 /*--  This program is free software: you can redistribute it and/or modify  --*/
 /*--  it under the terms of the GNU General Public License as published by  --*/
@@ -21,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
 
 /*----------------------------------------------------------------------------*/
 #define CMD_DECODE    0x00       // decode
@@ -70,8 +70,7 @@ unsigned char *Load(char *filename, unsigned int *length, int min, int max);
 void  Save(char *filename, unsigned char *buffer, int length);
 unsigned char *Memory(int length, int size);
 
-void  LZS_Decode(char *filename);
-void  LZS_Encode(char *filename, int mode);
+
 unsigned char *LZS_Code(unsigned char *raw_buffer, int raw_len, unsigned int *new_len, int best);
 
 unsigned char *LZS_Fast(unsigned char *raw_buffer, int raw_len, unsigned int *new_len);
@@ -80,19 +79,20 @@ void  LZS_InsertNode(int r);
 void  LZS_DeleteNode(int p);
 
 /*----------------------------------------------------------------------------*/
-int main(int argc, char **argv) {
-  int cmd, mode;
-  int arg;
+// int main(int argc, char **argv) {
+//   int cmd, mode;
+//   int arg;
 
-  if (argc < 2) EXIT("Filename not specified\n");
+//   if (argc < 2) EXIT("Filename not specified\n");
 
-  // for (arg = 2; arg < argc; arg++) LZS_Decode(argv[arg]);
-  for (arg = 1; arg < argc; arg++) LZS_Encode(argv[arg], LZS_WFAST);
+//   // for (arg = 2; arg < argc; arg++) LZS_Decode(argv[arg]);
+//   for (arg = 1; arg < argc; arg++) LZS_Encode(argv[arg], LZS_WFAST);
 
-  printf("\nDone\n");
+//   printf("\nDone\n");
 
-  return(0);
-}
+//   return(0);
+// }
+
 /*----------------------------------------------------------------------------*/
 unsigned char *Load(char *filename, unsigned int *length, int min, int max) {
   FILE *fp;
@@ -133,7 +133,7 @@ void Save(char *filename, unsigned char *buffer, int length) {
 unsigned char *Memory(int length, int size) {
   unsigned char *fb;
 
-  fb = (unsigned char *) calloc(length * size, size);
+  fb = (unsigned char *) calloc(length, size);
   if (fb == NULL) EXIT("\nMemory error\n");
 
   return(fb);
@@ -202,15 +202,18 @@ void LZS_Decode(char *filename) {
 }
 
 /*----------------------------------------------------------------------------*/
-void LZS_Encode(char *filename, int mode) {
+// void LZS_Encode(char *filename, int mode) {
+void LZS_Encode(unsigned char*data, unsigned int length) {
   unsigned char *raw_buffer, *pak_buffer, *new_buffer;
   unsigned int   raw_len, pak_len, new_len;
 
+  int mode = LZS_WFAST;
+
   lzs_vram = mode & 0xF;
 
-  printf("- encoding '%s'", filename);
-
-  raw_buffer = Load(filename, &raw_len, RAW_MINIM, RAW_MAXIM);
+  // raw_buffer = Load(filename, &raw_len, RAW_MINIM, RAW_MAXIM);
+  raw_buffer = data;
+  raw_len = length;
 
   pak_buffer = NULL;
   pak_len = LZS_MAXIM + 1;
@@ -227,10 +230,14 @@ void LZS_Encode(char *filename, int mode) {
     pak_len = new_len;
   }
 
-  Save(filename, pak_buffer, pak_len);
+  std::cout << pak_len << "\n";
 
-  free(pak_buffer);
-  free(raw_buffer);
+  // output = pak_buffer;
+  // Save("output_new", pak_buffer, pak_len);
+
+
+  // free(pak_buffer);
+  // free(raw_buffer);
 
   printf("\n");
 }

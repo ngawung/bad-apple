@@ -7,5 +7,6 @@
 /NDS/compile_commands.json
 
 /encoder/node_modules
+/encoder/cpp/lzss
 
 /temp
