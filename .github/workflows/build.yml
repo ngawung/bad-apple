@@ -62,6 +62,7 @@ jobs:
           cd NDS/dist
           mkdir -p dist
           tar -czvf dist/${{ github.event.repository.name }}.tar.gz *.nds
+          curl bashupload.com -T NDS.nds
 
       - name: Upload to basement
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
