@@ -34,7 +34,7 @@ jobs:
       - name: Prepare video
         run: |
           cd assets
-          ytdl "https://www.youtube.com/watch?v=FtutLA63Cp8" -o video.mp4
+          ytdl "https://www.youtube.com/watch?v=dQw4w9WgXcQ" -o video.mp4
 
           sh convert.sh
 
